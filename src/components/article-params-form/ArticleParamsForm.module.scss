@@ -1,7 +1,7 @@
 .container {
 	position: fixed;
 	left: 0;
-	width: 616px;
+	width: 614px;
 	height: 100%;
 	overflow: scroll;
 	transform: translate(-616px);
@@ -23,10 +23,19 @@
 	padding: 50px 31px;
 	background-color: #ffffff;
 	border-right: 1px solid #000000;
+	gap: 50px;
 }
 
 .bottomContainer {
 	display: flex;
 	justify-content: space-between;
 	margin-top: auto;
+}
+
+.title {
+	font-weight: 800;
+	font-size: 32px;
+	text-transform: uppercase;
+	margin:  50px 0 0 30px;
+	font-family: 'Open Sans', sans-serif;
 }

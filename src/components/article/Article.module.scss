@@ -1,20 +1,29 @@
+/* src/components/article/Article.module.scss */
 .article {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	row-gap: 24px;
-	max-width: var(--container-width, auto);
+
+	/* Ширина и фон через CSS-переменные */
+	max-width: var(--container-width);
 	margin: 0 auto;
 	padding: 72px 0 144px;
-}
 
-.titleDescription {
+	/* Типографика и цвет через CSS-переменные */
+	font-family: var(--font-family), sans-serif;
+	color: var(--font-color);
+	font-size: var(--font-size);
+	background-color: var(--bg-color);
+  }
+
+  .titleDescription {
 	max-width: 550px;
-}
+  }
 
-.image {
+  .image {
 	width: 100%;
 	height: auto;
 	margin-top: 26px;
-}
+  }
