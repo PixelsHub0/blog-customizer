@@ -1,4 +1,15 @@
-.main {
+/* src/styles/index.scss (или в любом глобальном файле) */
+:root {
+	--font-family: 'Open Sans';
+	--font-size: 18px;
+	--font-color: #000000;
 	--bg-color: #ffffff;
-	background-color: var(--bg-color, #ffffff);
-}
+	--container-width: 1394px;
+  }
+
+  .main {
+	font-family: var(--font-family);
+	color: var(--font-color);
+	background-color: var(--bg-color);
+  }
+
