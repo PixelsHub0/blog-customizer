@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import clsx from 'clsx';
 
 import { Article } from '../article';
 import { ArticleParamsForm } from '../article-params-form';
@@ -53,7 +52,7 @@ export const App: React.FC = () => {
      * Основной рендер приложения: обёртка <main> с классом из CSS-модуля
      * внутри располагаются панель настроек и сама статья.
      */
-    <main className={clsx(styles.main)}>
+    <main className={styles.main}>
       {/* Компонент панели настроек принимает текущие параметры и колбек для их обновления */}
       <ArticleParamsForm
         initialSettings={articleSettings}

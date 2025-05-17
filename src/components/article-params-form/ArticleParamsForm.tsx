@@ -1,19 +1,18 @@
-
+// src/components/article-params-form/ArticleParamsForm.tsx
 import React, {
 	useState,
 	useRef,
 	useEffect,
 	useCallback,
-	FormEvent
-  } from 'react';
-  import  clsx  from 'clsx';
-  import { ArrowButton } from '../../ui/arrow-button';
-  import { Button } from '../../ui/button';
-  import { Select } from '../../ui/select';
-  import { RadioGroup } from '../../ui/radio-group';
-  import { Separator } from '../../ui/separator';
-  import { useOutsideClickClose } from '../../ui/select/hooks/useOutsideClickClose';
-  import { Text } from 'src/ui/text';
+	FormEvent,
+  } from 'react'
+  import clsx from 'clsx'
+  import { ArrowButton } from '../../ui/arrow-button'
+  import { Button } from '../../ui/button'
+  import { Select } from '../../ui/select'
+  import { RadioGroup } from '../../ui/radio-group'
+  import { Separator } from '../../ui/separator'
+  import { Text } from '../../ui/text'
   import {
 	defaultArticleState,
 	ArticleStateType,
@@ -21,129 +20,104 @@ import React, {
 	fontSizeOptions,
 	fontColors,
 	backgroundColors,
-	contentWidthArr
-  } from '../../constants/articleProps';
-  import styles from './ArticleParamsForm.module.scss';
+	contentWidthArr,
+  } from '../../constants/articleProps'
+  import styles from './ArticleParamsForm.module.scss'
 
-  /**
-   * Пропсы компонента настроек статьи
-   * @param initialSettings - начальные значения настроек (по умолчанию defaultArticleState)
-   * @param onApply - колбек при применении настроек формы
-   */
   export type ArticleParamsFormProps = {
-	initialSettings?: ArticleStateType;
-	onApply?: (settings: ArticleStateType) => void;
-  };
+	initialSettings?: ArticleStateType
+	onApply?: (settings: ArticleStateType) => void
+  }
 
   /**
    * Компонент боковой панели для настройки параметров статьи
    */
   export const ArticleParamsForm: React.FC<ArticleParamsFormProps> = ({
 	initialSettings = defaultArticleState,
-	onApply = () => {}
+	onApply = () => {},
   }) => {
-	// Состояние открытия панели и текущие значения формы
-	const [isOpen, setIsOpen] = useState(false);
-	const [formState, setFormState] = useState<ArticleStateType>(
-	  initialSettings
-	);
+	const [isMenuOpen, setIsMenuOpen] = useState(false)
+	const [formState, setFormState] = useState<ArticleStateType>(initialSettings)
+	const sidebarRef = useRef<HTMLDivElement>(null)
 
-	//Реф для корневого элемента панели (для обработки кликов вне)
-	const sidebarRef = useRef<HTMLDivElement>(null);
-
-	// При каждом открытии сбрасываем форму на initialSettings
 	useEffect(() => {
-	  if (isOpen) {
-		setFormState(initialSettings);
+	  if (isMenuOpen) {
+		setFormState(initialSettings)
 	  }
-	}, [isOpen, initialSettings]);
+	}, [isMenuOpen, initialSettings])
 
-	// Закрываем панель при клике вне элемента
-	useOutsideClickClose({
-	  isOpen,
-	  rootRef: sidebarRef,
-	  onChange: setIsOpen
-	});
+	useEffect(() => {
+	  if (!isMenuOpen) return
+	  const handleClickOutside = (e: MouseEvent) => {
+		if (sidebarRef.current && !sidebarRef.current.contains(e.target as Node)) {
+		  setIsMenuOpen(false)
+		}
+	  }
+	  window.addEventListener('mousedown', handleClickOutside)
+	  return () => {
+		window.removeEventListener('mousedown', handleClickOutside)
+	  }
+	}, [isMenuOpen])
 
-	//Переключаем состояние панели
-	const toggleSidebar = useCallback(() => {
-	  setIsOpen(prev => !prev);
-	}, []);
+	const toggleMenu = useCallback(() => {
+	  setIsMenuOpen(open => !open)
+	}, [])
 
-	/**
-	 * Обновляем одно поле формы
-	 * @param key - ключ поля из ArticleStateType
-	 * @param value - новое значение поля
-	 */
 	const updateField = useCallback(
 	  <K extends keyof ArticleStateType>(key: K, value: ArticleStateType[K]) => {
-		setFormState(prev => ({ ...prev, [key]: value }));
+		setFormState(prev => ({ ...prev, [key]: value }))
 	  },
 	  []
-	);
+	)
 
-	/**
-	 * Обработка отправки формы: отменяем дефолт и вызываем onApply
-	 */
+	// Исправлено: теперь формальный тип события — для HTMLFormElement
 	const handleSubmit = useCallback(
-	  (e: FormEvent) => {
-		e.preventDefault();
-		onApply(formState);
+	  (e: FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
+		onApply(formState)
 	  },
 	  [formState, onApply]
-	);
+	)
 
-	/**
-	 * Обработка сброса формы: отменяем дефолт, сбрасываем и вызываем onApply
-	 */
-	  // внутри ArticleParamsForm.tsx
-
+	// Исправлено: аналогично для сброса формы
 	const handleReset = useCallback(
-	  (e: FormEvent) => {
-	  	  e.preventDefault();
-	   	 // 1) сброс формы к дефолтным настройкам при загрузке страницы
-	  	  setFormState(defaultArticleState);
-	  	  // 2) применить эти дефолтные настройки к статье
-	  	  onApply(defaultArticleState);
-		},
-	   [onApply]
-  	);
-
+	  (e: FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
+		setFormState(defaultArticleState)
+		onApply(defaultArticleState)
+	  },
+	  [onApply]
+	)
 
 	return (
 	  <>
-		{/* Кнопка-стрелка для открытия/закрытия панели */}
 		<div className={styles.toggleButtonWrapper}>
-		  <ArrowButton isOpen={isOpen} onClick={toggleSidebar} />
+		  <ArrowButton isOpen={isMenuOpen} onClick={toggleMenu} />
 		</div>
 
-		{/* Боковая панель */}
 		<aside
 		  ref={sidebarRef}
 		  className={clsx(styles.container, {
-			[styles.container_open]: isOpen
+			[styles.container_open]: isMenuOpen,
 		  })}
-		  aria-hidden={!isOpen}
+		  aria-hidden={!isMenuOpen}
 		>
-		  {isOpen && (
+		  {isMenuOpen && (
 			<form
 			  className={styles.form}
 			  onSubmit={handleSubmit}
 			  onReset={handleReset}
 			  noValidate
-			>
-			 {/* Заголовок панели */}
-			 <Text children='Задайте параметры' as='h2' size={31} weight={800} uppercase={true}/>
+					>
+			  <Text children='Задайте параметры' as='h2' size={31} weight={800} uppercase={true}/>
 
-			  {/* Выбор шрифта */}
+			  {/* Типографика */}
 			  <Select
 				title="Шрифт"
 				options={fontFamilyOptions}
 				selected={formState.fontFamilyOption}
 				onChange={opt => updateField('fontFamilyOption', opt)}
 			  />
-
-			  {/* Выбор размера шрифта */}
 			  <RadioGroup
 				title="Размер шрифта"
 				name="fontSize"
@@ -152,18 +126,15 @@ import React, {
 				onChange={opt => updateField('fontSizeOption', opt)}
 			  />
 
-			  {/* Выбор цвета шрифта */}
+			  <Separator />
+
+			  {/* Цвета */}
 			  <Select
 				title="Цвет шрифта"
 				options={fontColors}
 				selected={formState.fontColor}
 				onChange={opt => updateField('fontColor', opt)}
 			  />
-
-			  {/* Разделитель */}
-			  <Separator />
-
-			  {/* Выбор цвета фона */}
 			  <Select
 				title="Цвет фона"
 				options={backgroundColors}
@@ -171,7 +142,9 @@ import React, {
 				onChange={opt => updateField('backgroundColor', opt)}
 			  />
 
-			  {/* Выбор ширины контента */}
+			  <Separator />
+
+			  {/* Геометрия */}
 			  <Select
 				title="Ширина контента"
 				options={contentWidthArr}
@@ -179,7 +152,6 @@ import React, {
 				onChange={opt => updateField('contentWidth', opt)}
 			  />
 
-			  {/* Кнопки действий */}
 			  <div className={styles.bottomContainer}>
 				<Button title="Сбросить" type="clear" htmlType="reset" />
 				<Button title="Применить" type="apply" htmlType="submit" />
@@ -188,5 +160,5 @@ import React, {
 		  )}
 		</aside>
 	  </>
-	);
-  };
+	)
+  }
